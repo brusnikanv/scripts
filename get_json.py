@@ -2,7 +2,11 @@ import requests, json
 
 
 def check_status():
-    content = requests.get("https://10.16.8.90/monitoring/", verify=False)
+    try:
+        content = requests.get("https://10.16.8.90/monitoring/", verify=False, timeout=10)
+    except:
+        telegram_bot_sendtext('server not resolve')
+
     json_data = dict(json.loads(content.content))
     # print(json_data['servers']['core']['status'])
     services_status = json_data['servers']
