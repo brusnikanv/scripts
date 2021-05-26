@@ -1,10 +1,10 @@
 import requests, json, time
-
+from connect import connect_device
 
 def check_status():
     while True:
         try:
-            content = requests.get("https://10.16.8.90/monitoring/", verify=False, timeout=10)
+            content = requests.get("https://10.16.8.87/monitoring/", verify=False, timeout=20)
         except:
             telegram_bot_sendtext('server not resolve')
 
@@ -19,24 +19,27 @@ def check_status():
             service_name = service_status[0]
             srv_status = service_status[1]['status']
 
-
             if srv_status != 1:
-                telegram_bot_sendtext('Service Down - {0}'.format(service_name))
-
+                telegram_bot_sendtext('Service Core Down - {0}'.format(service_name))
 
         for device in devices_list.items():
             dvc_name = device[0]
-            #print(dvc_name)
             dvc_status = device[1]['status']
-            dvc_services = device[1]['subservices']
+            print(device[1]['status'])
+            dvc_services = json.dumps(device[1]['subservices']).replace("_", "")
+            print(dvc_services)
 
-            if dvc_status == 2:
-                telegram_bot_sendtext('Device services has Problem - {0}-{1}'.format(dvc_name, dvc_services))
+            #тут изменить обратно на правильный статус 2
+            if dvc_status == 1:
+                #save log to file
+                connect_device()
+                print(telegram_bot_sendtext('Device services has Problem - {0} {1}'.format(dvc_name, dvc_services)))
+
             elif dvc_status == 0:
-                    telegram_bot_sendtext('Device Down - {0}'.format(dvc_name))
+                telegram_bot_sendtext('Device Down - {0}'.format(dvc_name))
 
             else:
-               pass
+                pass
             time.sleep(10)
 
 
